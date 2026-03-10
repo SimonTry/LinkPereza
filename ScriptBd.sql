@@ -1,3 +1,6 @@
+Script Base de datos
+
+
 -- --------------------------------------------------------
 -- Tabla de Autores
 -- --------------------------------------------------------
@@ -95,3 +98,112 @@ INSERT INTO Ventas (id_venta, id_libro, id_cliente, fecha_venta, cantidad) VALUE
 (309, 104, 201, '2025-02-15', 1),
 (310, 109, 204, '2025-02-18', 1);
 GO
+
+a. Sentencia SELECT
+
+* Pregunta: Muestra todos los libros disponibles en la librería.
+* Consulta: SQL  SELECT * FROM Libros;
+*    
+* Pregunta: Muestra únicamente los nombres y apellidos de todos los autores.
+* Consulta: SQL  SELECT nombre, apellido FROM Autores;
+*    
+
+b. Cláusula WHERE
+
+* Pregunta: Encuentra los libros cuyo precio sea superior a $25.
+* Consulta: SQL  SELECT titulo, precio FROM Libros WHERE precio > 25.00;
+*    
+* Pregunta: Muestra todos los clientes que viven en la ciudad de Medellín.
+* Consulta: SQL  SELECT * FROM Clientes WHERE ciudad = 'Medellín';
+*    
+
+c. Cláusula JOIN
+
+* Pregunta: Muestra el título de cada libro junto con el nombre y apellido de su autor.
+* Consulta: SQL  SELECT
+*     L.titulo,
+*     A.nombre,
+*     A.apellido
+* FROM Libros AS L
+* INNER JOIN Autores AS A ON L.id_autor = A.id_autor;
+*    
+* Pregunta: Muestra el nombre del cliente que compró cada libro y la fecha de la venta.
+* Consulta: SQL  SELECT
+*     C.nombre AS nombre_cliente,
+*     L.titulo AS titulo_libro,
+*     V.fecha_venta
+* FROM Ventas AS V
+* INNER JOIN Clientes AS C ON V.id_cliente = C.id_cliente
+* INNER JOIN Libros AS L ON V.id_libro = L.id_libro;
+*    
+
+d. Cláusula GROUP BY y Funciones de Agregación
+
+* Pregunta: ¿Cuántos libros hay por cada género?
+* Consulta: SQL  SELECT genero, COUNT(*) AS total_libros
+* FROM Libros
+* GROUP BY genero;
+*    
+* Pregunta: ¿Cuál es el precio promedio de los libros de cada autor?
+* Consulta: SQL  SELECT
+*     A.nombre,
+*     A.apellido,
+*     AVG(L.precio) AS precio_promedio
+* FROM Libros AS L
+* INNER JOIN Autores AS A ON L.id_autor = A.id_autor
+* GROUP BY A.id_autor, A.nombre, A.apellido;
+*    
+* Pregunta: Calcula la cantidad total de libros vendidos por cada cliente.
+* Consulta: SQL  SELECT
+*     C.nombre,
+*     C.apellido,
+*     SUM(V.cantidad) AS total_libros_comprados
+* FROM Ventas AS V
+* INNER JOIN Clientes AS C ON V.id_cliente = C.id_cliente
+* GROUP BY C.id_cliente, C.nombre, C.apellido;
+*    
+
+e. Cláusula ORDER BY
+
+* Pregunta: Muestra todos los libros, ordenados del más nuevo al más antiguo por su año de publicación.
+* Consulta: SQL  SELECT titulo, anio_publicacion FROM Libros
+* ORDER BY anio_publicacion DESC;
+*    
+* Pregunta: Lista los autores en orden alfabético por su apellido.
+* Consulta: SQL  SELECT nombre, apellido FROM Autores
+* ORDER BY apellido ASC;
+*    
+
+f. Cláusula HAVING
+    
+* Pregunta: Muestra los géneros de libros donde la cantidad de libros es mayor a 1.
+* Consulta: SQL  SELECT genero, COUNT(*) AS total_libros
+* FROM Libros
+* GROUP BY genero
+* HAVING COUNT(*) > 1;
+*    
+* Pregunta: ¿Qué autores tienen un precio promedio de sus libros superior a $20?
+* Consulta: SQL  SELECT
+*     A.nombre,
+*     A.apellido,
+*     AVG(L.precio) AS precio_promedio
+* FROM Libros AS L
+* INNER JOIN Autores AS A ON L.id_autor = A.id_autor
+* GROUP BY A.id_autor
+* HAVING AVG(L.precio) > 20.00;
+*    
+
+g. Subconsultas
+
+* Pregunta: Encuentra los títulos de los libros que han sido vendidos.
+* Consulta: SQL  SELECT titulo FROM Libros
+* WHERE id_libro IN (SELECT DISTINCT id_libro FROM Ventas);
+*    
+* Pregunta: Muestra el nombre de los clientes que han comprado el libro 'Cien años de soledad'.
+* Consulta: SQL  SELECT nombre, apellido FROM Clientes
+* WHERE id_cliente IN (
+*     SELECT id_cliente FROM Ventas
+*     WHERE id_libro = (SELECT id_libro FROM Libros WHERE titulo = 'Cien años de soledad')
+* );
+*    
+

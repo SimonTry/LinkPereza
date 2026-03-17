@@ -98,7 +98,17 @@ INSERT INTO Ventas (id_venta, id_libro, id_cliente, fecha_venta, cantidad) VALUE
 (309, 104, 201, '2025-02-15', 1),
 (310, 109, 204, '2025-02-18', 1);
 GO
-
+    
+CREATE TABLE HistorialPreciosLibros (
+    id_historial INT PRIMARY KEY IDENTITY,
+    id_libro INT,
+    precio_anterior DECIMAL(10, 2),
+    precio_nuevo DECIMAL(10, 2),
+    fecha_cambio DATETIME DEFAULT GETDATE(),
+CONSTRAINT FK_Historial_Libro FOREIGN KEY (id_libro) REFERENCES Libros(id_libro)
+);
+GO
+    
 a. Sentencia SELECT
 
 * Pregunta: Muestra todos los libros disponibles en la librería.

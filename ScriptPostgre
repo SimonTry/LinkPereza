@@ -1,0 +1,22 @@
+
+create table clientes (
+  id bigint primary key generated always as identity,
+  nombre text not null,
+  apellido text not null
+);
+
+create table ciudades (
+  id bigint primary key generated always as identity,
+  codigo_postal text not null,
+  nombre text not null
+);
+
+alter table clientes
+add column ciudad_id bigint,
+add constraint fk_ciudad foreign key (ciudad_id) references ciudades (id);
+
+alter table clientes
+rename column id to id_cliente;
+
+alter table clientes
+rename column apellido to primerapellido;

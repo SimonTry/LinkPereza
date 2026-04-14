@@ -121,6 +121,16 @@ $$ LANGUAGE plpgsql;
 
 select public.calcular_subtotal(20,30)
 
+CREATE OR REPLACE VIEW PedidosEnDespacho
+AS
+	select C.nombre, P.id, P.fecha_pedido, P.estado 
+	from Clientes as C
+	join Pedidos as P on C.id = P.cliente_id
+	where P.estado = 'en progreso'
+	order by P.id desc
+
+
+select * from PedidosEnDespacho
 
 CREATE OR REPLACE PROCEDURE actualizar_stock
 (id_producto int, nueva_cantidad int)

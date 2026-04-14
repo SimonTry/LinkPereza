@@ -1,0 +1,35 @@
+-- Migrations will appear here as you chat with AI
+
+create table productos (
+  id bigint primary key generated always as identity,
+  nombreproducto text not null,
+  precio_unitario numeric(10, 2) not null,
+  stock int not null,
+  tipo_producto text not null
+);
+
+create table clientes (
+  id bigint primary key generated always as identity,
+  nombre text not null,
+  telefono text not null
+);
+
+create table pedidos (
+  id bigint primary key generated always as identity,
+  valor_total numeric(10, 2) not null
+);
+
+create table lineas_pedido (
+  id bigint primary key generated always as identity,
+  pedido_id bigint references pedidos (id),
+  producto_id bigint references productos (id),
+  cantidad int not null,
+  precio_unitario numeric(10, 2) not null
+);
+
+alter table pedidos
+add column cliente_id bigint references clientes (id),
+add column fecha_pedido timestamp with time zone default now(),
+add column estado text check (
+  estado in ('cancelada', 'pagada', 'entregada', 'en progreso')
+) not null;

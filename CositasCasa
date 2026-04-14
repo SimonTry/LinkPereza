@@ -33,3 +33,78 @@ add column fecha_pedido timestamp with time zone default now(),
 add column estado text check (
   estado in ('cancelada', 'pagada', 'entregada', 'en progreso')
 ) not null;
+
+
+-- INSERT
+
+-- PRODUCTOS (HOGAR)
+insert into productos (nombreproducto, precio_unitario, stock, tipo_producto) values
+('Silla Plástica', 45000.00, 100, 'hogar'),
+('Mesa Plegable', 120000.00, 50, 'hogar'),
+('Lámpara LED', 35000.00, 80, 'hogar'),
+('Juego de Sábanas', 90000.00, 40, 'hogar'),
+('Cortinas', 70000.00, 60, 'hogar');
+
+-- CLIENTES
+insert into clientes (nombre, telefono) values
+('Juan Pérez', '3001234567'),
+('María Gómez', '3012345678'),
+('Carlos Rodríguez', '3023456789'),
+('Ana Martínez', '3034567890'),
+('Luis Fernández', '3045678901');
+
+-- PEDIDOS (15)
+insert into pedidos (valor_total, cliente_id, estado) values
+(90000.00, 1, 'pagada'),
+(120000.00, 2, 'entregada'),
+(45000.00, 3, 'en progreso'),
+(180000.00, 4, 'pagada'),
+(35000.00, 5, 'cancelada'),
+(155000.00, 1, 'entregada'),
+(140000.00, 2, 'pagada'),
+(70000.00, 3, 'en progreso'),
+(80000.00, 4, 'pagada'),
+(210000.00, 5, 'entregada'),
+(135000.00, 1, 'pagada'),
+(45000.00, 2, 'cancelada'),
+(105000.00, 3, 'entregada'),
+(160000.00, 4, 'pagada'),
+(190000.00, 5, 'en progreso');
+
+-- LINEAS_PEDIDO
+insert into lineas_pedido (pedido_id, producto_id, cantidad, precio_unitario) values
+(1, 1, 2, 45000.00),
+
+(2, 2, 1, 120000.00),
+
+(3, 1, 1, 45000.00),
+
+(4, 4, 2, 90000.00),
+
+(5, 3, 1, 35000.00),
+
+(6, 1, 1, 45000.00),
+(6, 3, 2, 35000.00),
+
+(7, 5, 2, 70000.00),
+
+(8, 5, 1, 70000.00),
+
+(9, 3, 2, 35000.00),
+
+(10, 2, 1, 120000.00),
+(10, 4, 1, 90000.00),
+
+(11, 1, 1, 45000.00),
+(11, 4, 1, 90000.00),
+
+(12, 1, 1, 45000.00),
+
+(13, 3, 3, 35000.00),
+
+(14, 2, 1, 120000.00),
+(14, 5, 1, 70000.00),
+
+(15, 4, 1, 90000.00),
+(15, 3, 1, 35000.00),
+(15, 1, 1, 45000.00);

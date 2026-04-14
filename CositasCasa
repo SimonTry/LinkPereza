@@ -120,3 +120,17 @@ $$ LANGUAGE plpgsql;
 
 
 select public.calcular_subtotal(20,30)
+
+
+CREATE OR REPLACE PROCEDURE actualizar_stock
+(id_producto int, nueva_cantidad int)
+AS $$
+BEGIN
+	UPDATE Productos set stock = nueva_cantidad
+	where id = id_producto;
+END;
+$$ LANGUAGE plpgsql;
+
+call actualizar_stock(3,70)
+
+select * from Productos

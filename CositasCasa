@@ -108,3 +108,15 @@ insert into lineas_pedido (pedido_id, producto_id, cantidad, precio_unitario) va
 (15, 4, 1, 90000.00),
 (15, 3, 1, 35000.00),
 (15, 1, 1, 45000.00);
+
+
+CREATE OR REPLACE FUNCTION calcular_subtotal
+(precio DECIMAL, cantidad INT)
+RETURNS DECIMAL AS $$
+BEGIN
+	RETURN precio * cantidad;
+END;
+$$ LANGUAGE plpgsql;
+
+
+select public.calcular_subtotal(20,30)

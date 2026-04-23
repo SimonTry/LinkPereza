@@ -1,0 +1,3 @@
+host: pqrserverdev.database.windows.net
+bd: lpqr_Lappiz
+user: pqr_lappiz

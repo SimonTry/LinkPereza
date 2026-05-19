@@ -111,3 +111,115 @@ INSERT INTO Notas (EstudianteID, CursoID, Nota1, Nota2, Nota3, Nota4, Nota5) VAL
 (4, 3, 4.5, 4.5, 4.0, 4.5, 4.8), 
 (5, 3, 3.0, 3.0, 3.0, 3.0, 3.0);
 GO
+
+-- 1. ¿Cuál es la nota defitiniva de los estudiantes por cada curso?
+-- Nota 1 y 2: 15%
+-- Nota 3 y 4: 20%
+-- Nota 5: 30%
+select e.Nombre, c.NombreCurso,
+N.Nota1 * 0.15 + N.Nota2 * 0.15 + N.Nota3 * 0.20 + N.Nota4 * 0.20 + ISNULL(N.Nota5 * 0.30,0) 
+as NotaDefinitiva
+from Notas as N 
+join Estudiantes as E on n.EstudianteID = e.EstudianteID
+join Cursos as C on n.CursoID = c.CursoID
+order by e.Nombre asc
+
+-- Top 3 de mejores estudiantes (Rendimiento general de los esutidante)
+select Top 3 e.Nombre,
+AVG(N.Nota1 * 0.15 + N.Nota2 * 0.15 + N.Nota3 * 0.20 + 
+N.Nota4 * 0.20 + ISNULL(N.Nota5 * 0.30,0))
+as PromedioGeneral
+from Notas as N 
+join Estudiantes as E on n.EstudianteID = e.EstudianteID
+join Cursos as C on n.CursoID = c.CursoID
+group by e.Nombre
+order by PromedioGeneral desc
+
+-- ¿Cuál es el Curso con el peor rendimiento promedio?
+select Top 1 c.NombreCurso,
+AVG(N.Nota1 * 0.15 + N.Nota2 * 0.15 + N.Nota3 * 0.20 + 
+N.Nota4 * 0.20 + ISNULL(N.Nota5 * 0.30,0))
+as PromedioGeneral
+from Notas as N 
+join Estudiantes as E on n.EstudianteID = e.EstudianteID
+join Cursos as C on n.CursoID = c.CursoID
+
+--¿Cuál es el curso con más estudiantes aprobados?
+select c.NombreCurso,
+SUM(CASE WHEN N.Nota1 * 0.15 + N.Nota2 * 0.15 + N.Nota3 * 0.20 + 
+N.Nota4 * 0.20 + ISNULL(N.Nota5 * 0.30,0) >= 3 THEN 1 ELSE 0 END) 
+as CantidadEstudiantes
+from Notas as N 
+join Estudiantes as E on n.EstudianteID = e.EstudianteID
+join Cursos as C on n.CursoID = c.CursoID
+GROUP BY c.NombreCurso, c.CursoID
+order by CantidadEstudiantes desc
+
+-- Crear una función para calcular la nota definitiva
+CREATE FUNCTION calcularNotaDefinitiva(
+    @Nota1 FLOAT, @Nota2 FLOAT, @Nota3 FLOAT, @Nota4 FLOAT, @Nota5 FLOAT
+)
+RETURNS FLOAT
+AS
+BEGIN
+    declare @resultado FLOAT
+    set @resultado = @Nota1 * 0.15 + @Nota2 * 0.15 + @Nota3 * 0.20 + 
+    @Nota4 * 0.20 + ISNULL(@Nota5 * 0.30,0)
+    return @resultado
+END
+
+select e.Nombre, c.NombreCurso, 
+dbo.calcularNotaDefinitiva(n.nota1, n.nota2,
+n.nota3,n.nota4, n.nota5)  from Notas as n join Estudiantes as e
+on n.EstudianteID = e.EstudianteID
+join Cursos as c on n.CursoID = c.CursoID
+
+-- Crear un procedimiento almacenado para actualizar
+-- masivamente las notas de los estudiantes usando la función
+-- anterior para un curso específico
+CREATE PROCEDURE ActualizarNotaDefinitivaCurso(
+    @idCurso INT
+)
+AS
+BEGIN
+    IF not exists(select 1 from Cursos where CursoID = @idCurso)
+    BEGIN
+        print('El curso no existe')
+    END
+    ELSE
+    BEGIN
+        Update Notas SET NotaFinal = 
+        dbo.calcularNotaDefinitiva(Nota1, Nota2, Nota3, Nota4, Nota5)
+        Where CursoID = @idCurso
+        AND Nota5 IS NOT NULL  
+        AND Nota4 IS NOT NULL 
+        AND Nota3 IS NOT NULL 
+        AND Nota4 IS NOT NULL
+        AND Nota1 IS NOT NULL
+    END
+
+    print('Notas actualizadas')
+END
+
+exec ActualizarNotaDefinitivaCurso @idCurso = 2
+
+-- Trigger para que al calcular la nota final de un estudiante
+-- Se actulice el estado a Aprobado o Reprobado
+CREATE TRIGGER ActualiazarEstadoEstudiante
+ON Notas
+AFTER UPDATE
+AS
+BEGIN
+    IF UPDATE(NotaFinal)
+    BEGIN
+        Update e set e.Estado = 
+            CASE WHEN i.NotaFinal >= 3 THEN 'Aprobado' ELSE 'Reprobado' END
+         from Estudiantes as e join inserted as I on e.EstudianteId = I.EstudianteID
+         where I.NotaFinal is not null
+    END
+END
+
+
+select * from Estudiantes
+select EstudianteID,NotaFinal from Notas where CursoID = 2
+exec ActualizarNotaDefinitivaCurso @idCurso = 2
